@@ -11,9 +11,7 @@ jobs:
           name: Update Submodule
           command: |
             ls
-            git submodule sync --recursive
-            git submodule update --init --recursive
-            git submodule update --remote secondary-repo
+            cd ..; ls; git submodule update --remote secondary-repo
 
       - run: echo "Building steps for main repository..."
 
