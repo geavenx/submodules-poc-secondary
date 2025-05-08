@@ -10,6 +10,7 @@ jobs:
       - run:
           name: Update Submodule
           command: |
+            ls
             git submodule sync --recursive
             git submodule update --init --recursive
             git submodule update --remote secondary-repo
