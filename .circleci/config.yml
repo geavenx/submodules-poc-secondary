@@ -1,0 +1,24 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      # fetch the submodule
+      - run:
+          name: Update Submodule
+          command: |
+            git submodule sync --recursive
+            git submodule update --init --recursive
+
+      - run: echo "Building steps for main repository..."
+
+workflows:
+  build_on_push_or_trigger:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: main
