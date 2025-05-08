@@ -1,0 +1,42 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run: echo "secondary repository build step..."
+
+workflows:
+  build_and_trigger_main:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore: /.*/ # Ignore regular branch pushes for this workflow
+            tags:
+              ignore: /.*/ # Ignore tags
+      - trigger_main_ci: # run this job only if the build step returns success and the PR is merged
+          requires:
+            - build
+          # This job will be triggered manually or via a webhook
+          # In a real scenario, you'd likely use a webhook
+          filters:
+            branches:
+              only: main
+
+  # TODO: need to configure the webhook in CircleCI
+
+  trigger_main_ci:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - run:
+          name: Trigger Main Repository Build
+          command: |
+            curl -X POST \
+              -H "Content-Type: application/json" \
+              -H "Circle-Token: ${MAIN_REPO_CI_TRIGGER_TOKEN}" \
+              -d '{"branch": "main"}' \
+              "https://circleci.com/api/v2/project/github/geavenx/submodules-poc-main/pipeline"
